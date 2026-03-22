@@ -57,7 +57,7 @@ jobs:
 
 
       - name: Build JAR
-        working-directory: ./sm-health-core
+        working-directory: ./
         run: mvn clean package -DskipTests
 
       - name: Build e Push da imagem Docker

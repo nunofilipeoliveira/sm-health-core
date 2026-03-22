@@ -1,0 +1,41 @@
+version: '3.8'
+
+# Exemplo de configuração com Redis
+# Uso: docker-compose -f docker-compose.yml -f docker-compose.redis.yml up -d
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_REDIS_HOST=db
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: redis:7-alpine
+    container_name: sm-health-core-db
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - db_data:/data
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

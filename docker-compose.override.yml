@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Arquivo de exemplo para configurações alternativas
+# Copie este arquivo para docker-compose.override.yml e modifique conforme necessário
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/sm_health
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    # healthcheck:
+    #   test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    # volumes:
+    #   - ./logs:/app/logs

@@ -1,0 +1,53 @@
+version: '3.8'
+
+# Configuração para ambiente de produção
+# Uso: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core-prod
+    ports:
+      - "80:8080"
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/sm_health
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-root}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-root}
+    depends_on:
+      - db
+    networks:
+      - app-network
+    # healthcheck:
+    #   test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    # volumes:
+    #   - ./logs:/app/logs
+
+  db:
+    image: mariadb:11
+    container_name: sm-health-core-db-prod
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root}
+      - MYSQL_DATABASE=${DB_NAME:-sm_health}
+      - MYSQL_USER=${DB_USER:-sm_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-sm_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

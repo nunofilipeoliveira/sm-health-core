@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Exemplo de configuração com Oracle
+# Uso: docker-compose -f docker-compose.yml -f docker-compose.oracle.yml up -d
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521:XE
+      - SPRING_DATASOURCE_USERNAME=system
+      - SPRING_DATASOURCE_PASSWORD=oracle
+      - SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.OracleDialect
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: sm-health-core-db
+    restart: unless-stopped
+    environment:
+      - ORACLE_PASSWORD=oracle
+      - APP_USER=sm_user
+      - APP_USER_PASSWORD=sm_password
+    ports:
+      - "1521:1521"
+    volumes:
+      - db_data:/opt/oracle/oradata
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

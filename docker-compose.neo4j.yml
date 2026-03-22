@@ -1,0 +1,44 @@
+version: '3.8'
+
+# Exemplo de configuração com Neo4j
+# Uso: docker-compose -f docker-compose.yml -f docker-compose.neo4j.yml up -d
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_NEO4J_URI=bolt://db:7687
+      - SPRING_NEO4J_AUTHENTICATION_USERNAME=neo4j
+      - SPRING_NEO4J_AUTHENTICATION_PASSWORD=neo4j
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: neo4j:5
+    container_name: sm-health-core-db
+    restart: unless-stopped
+    environment:
+      - NEO4J_AUTH=neo4j/neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - db_data:/data
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge

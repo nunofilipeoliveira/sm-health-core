@@ -1,0 +1,23 @@
+version: '3.8'
+
+# Configuração para ambiente de desenvolvimento
+# Uso: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  sm-health-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sm-health-core-dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_H2_CONSOLE_ENABLED=true
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
